@@ -20,6 +20,7 @@
  * version, signal badges, and action links (GitHub + Docs).
  */
 
+import type { ReactNode } from "react";
 import { ExternalLink } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { TYPE_STRIPE_COLORS } from "@/components/ui/type-stripe-colors";
@@ -37,6 +38,8 @@ export interface DetailHeaderProps {
   signals: string[];
   hrefRepository?: string | null;
   hrefDocs?: string | null;
+  /** Extra controls for the action row, after the Source and Docs links. */
+  actions?: ReactNode;
 }
 
 const PILL_CLASS: Record<string, string> = {
@@ -58,6 +61,7 @@ export function DetailHeader({
   signals,
   hrefRepository,
   hrefDocs,
+  actions,
 }: DetailHeaderProps) {
   const { t } = useTranslation("detail");
   const { t: tc } = useTranslation("collector");
@@ -94,7 +98,7 @@ export function DetailHeader({
           ))}
         </div>
       )}
-      {(hrefRepository || hrefDocs) && (
+      {(hrefRepository || hrefDocs || actions) && (
         <div className="td-detail-header__actions">
           {hrefRepository && (
             <a
@@ -118,6 +122,7 @@ export function DetailHeader({
               {t("header.docs")}
             </a>
           )}
+          {actions}
         </div>
       )}
     </header>

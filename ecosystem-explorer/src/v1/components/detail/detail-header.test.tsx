@@ -86,4 +86,23 @@ describe("DetailHeader", () => {
 
     expect(screen.queryByRole("link")).not.toBeInTheDocument();
   });
+
+  it("renders extra actions even without source or docs links", () => {
+    render(
+      <DetailHeader
+        type="receiver"
+        distribution="core"
+        displayName="OTLP Receiver"
+        slug="otlpreceiver"
+        stability="stable"
+        version="0.150.0"
+        signals={[]}
+        hrefRepository={null}
+        hrefDocs={null}
+        actions={<button type="button">Add to build</button>}
+      />
+    );
+
+    expect(screen.getByRole("button", { name: "Add to build" })).toBeInTheDocument();
+  });
 });

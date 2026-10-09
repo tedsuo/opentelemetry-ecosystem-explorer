@@ -1,0 +1,57 @@
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/* ---------- Collector Builder "Add to build" toggle ----------
+ *
+ * `.td-build-toggle` is the icon-only button on list rows and cards. The labeled
+ * variant in the detail header is a `.td-btn` and only borrows the pressed state.
+ * Pressed (in the build) uses the `.td-btn--primary` orange-on-black pairing.
+ */
+
+.td-build-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 1px solid hsl(var(--border-hsl));
+  border-radius: 0.375rem;
+  background-color: hsl(var(--card-hsl));
+  color: hsl(var(--muted-foreground-hsl));
+  cursor: pointer;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease;
+}
+
+.td-build-toggle:hover {
+  border-color: hsl(var(--primary-hsl) / 0.6);
+  color: hsl(var(--foreground-hsl));
+}
+
+.td-build-toggle:focus-visible {
+  outline: 2px solid hsl(var(--otel-orange-hsl));
+  outline-offset: 2px;
+}
+
+.td-build-toggle[aria-pressed="true"],
+.td-build-toggle--label[aria-pressed="true"] {
+  background-color: hsl(var(--otel-orange-hsl));
+  border-color: hsl(var(--otel-orange-hsl));
+  color: #000;
+}

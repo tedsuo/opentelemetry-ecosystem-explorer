@@ -17,7 +17,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes, useLocation, useNavigate } from "react-router-dom";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { CollectorDetailPageV1 } from "@/v1/features/detail/detail-page";
 import {
@@ -528,5 +528,55 @@ describe("Collector detail release changes", () => {
       "aria-selected",
       "true"
     );
+  });
+});
+
+describe("CollectorDetailPageV1 with the Collector Builder enabled", () => {
+  beforeEach(() => {
+    localStorage.clear();
+    vi.stubEnv("VITE_FEATURE_FLAG_COLLECTOR_BUILDER", "true");
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it("adds the component to the build from the header", async () => {
+    const user = userEvent.setup();
+    mockHooks();
+    renderAtRoute("/collector/components/core/otlpreceiver");
+
+    const toggle = screen.getByRole("button", { name: "Add to build" });
+    await user.click(toggle);
+
+    expect(toggle).toHaveAttribute("aria-pressed", "true");
+    expect(localStorage.getItem("explorer:collectorBuild:v1")).toContain("core-otlpreceiver");
+  });
+
+  it("offers no toggle on a removed component", () => {
+    mockHooks({ componentVersionsState: { data: ["0.149.0"] } });
+    vi.mocked(useCollectorDeprecations).mockReturnValue({
+      data: {
+        ecosystem: "collector",
+        components: [
+          {
+            id: "core-otlpreceiver",
+            name: "otlpreceiver",
+            distribution: "core",
+            type: "receiver",
+            component_hash: "abc123def456",
+            last_version: "0.149.0",
+            deprecated_in_version: "0.150.0",
+          },
+        ],
+      },
+      loading: false,
+      error: null,
+    });
+
+    renderAtRoute("/collector/components/core/otlpreceiver?version=deprecated");
+
+    expect(screen.getByRole("note")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Add to build" })).not.toBeInTheDocument();
   });
 });

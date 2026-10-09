@@ -37,6 +37,7 @@ import { AlertCircle, AlertTriangle, Loader2 } from "lucide-react";
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { CollectorComponentType } from "@/components/ui/type-stripe-colors";
+import { CollectorBuildToggle } from "@/features/collector/builder/collector-build-toggle";
 import { CollectorReadmeTab } from "@/features/collector/components/collector-readme-tab";
 import {
   useCollectorComponent,
@@ -325,6 +326,16 @@ export function CollectorDetailPageV1() {
             signals={signals}
             hrefRepository={href}
             hrefDocs={null}
+            actions={
+              deprecatedEntry ? null : (
+                <CollectorBuildToggle
+                  componentId={component.id}
+                  componentName={displayName}
+                  showLabel
+                  className="td-btn td-btn--outline-dark td-build-toggle--label"
+                />
+              )
+            }
           />
 
           <section id="placement">

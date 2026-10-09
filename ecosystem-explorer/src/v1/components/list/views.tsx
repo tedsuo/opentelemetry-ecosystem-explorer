@@ -22,6 +22,7 @@
  * decision, not a data-shape decision.
  */
 
+import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
@@ -81,55 +82,79 @@ export function CompactRow({ row }: CompactRowProps) {
 
 export interface ListViewProps {
   rows: ListRow[];
+  /**
+   * Renders a control beside each row, outside its link: a button can't nest inside an
+   * `<a>`. Returning null leaves that row without one.
+   */
+  renderAction?: (row: ListRow) => ReactNode;
 }
 
-export function CompactList({ rows }: ListViewProps) {
+export function CompactList({ rows, renderAction }: ListViewProps) {
   return (
     <div className="td-list td-list--compact">
-      {rows.map((row) => (
-        <CompactRow key={row.id} row={row} />
-      ))}
+      {rows.map((row) => {
+        const action = renderAction?.(row);
+        return (
+          <div
+            key={row.id}
+            className={action ? "td-row-item td-row-item--with-action" : "td-row-item"}
+          >
+            <CompactRow row={row} />
+            {action && <div className="td-row__action">{action}</div>}
+          </div>
+        );
+      })}
     </div>
   );
 }
 
-export function CardView({ rows }: ListViewProps) {
+export function CardView({ rows, renderAction }: ListViewProps) {
   const { t } = useTranslation("list");
   return (
     <div className="td-list td-list--cards">
-      {rows.map((row) => (
-        <Link key={row.id} to={row.href} className="td-card">
-          <span
-            aria-hidden
-            className="td-card__stripe"
-            style={{ backgroundColor: TYPE_STRIPE_COLORS[row.type] }}
-          />
-          <div className="td-card__head">
-            <strong className="td-card__name">{row.displayName}</strong>
-            <StatusPill stability={row.stability} />
+      {rows.map((row) => {
+        const action = renderAction?.(row);
+        return (
+          <div
+            key={row.id}
+            className={action ? "td-card-item td-card-item--with-action" : "td-card-item"}
+          >
+            <Link to={row.href} className="td-card">
+              <span
+                aria-hidden
+                className="td-card__stripe"
+                style={{ backgroundColor: TYPE_STRIPE_COLORS[row.type] }}
+              />
+              <div className="td-card__head">
+                <strong className="td-card__name">{row.displayName}</strong>
+                <StatusPill stability={row.stability} />
+              </div>
+              <code className="td-card__slug">{row.name}</code>
+              {row.description && <p className="td-card__description">{row.description}</p>}
+              <div className="td-card__meta">
+                <span className="td-card__type">{row.type}</span>
+                {row.signals.length > 0 && (
+                  <span className="td-card__signals">{row.signals.join(", ")}</span>
+                )}
+                <span className="td-card__dist">{row.distribution}</span>
+                {row.deprecatedInVersion && (
+                  <span className="td-card__removed">
+                    {t("deprecated.removedIn", { version: row.deprecatedInVersion })}
+                  </span>
+                )}
+              </div>
+            </Link>
+            {action && <div className="td-card__action">{action}</div>}
           </div>
-          <code className="td-card__slug">{row.name}</code>
-          {row.description && <p className="td-card__description">{row.description}</p>}
-          <div className="td-card__meta">
-            <span className="td-card__type">{row.type}</span>
-            {row.signals.length > 0 && (
-              <span className="td-card__signals">{row.signals.join(", ")}</span>
-            )}
-            <span className="td-card__dist">{row.distribution}</span>
-            {row.deprecatedInVersion && (
-              <span className="td-card__removed">
-                {t("deprecated.removedIn", { version: row.deprecatedInVersion })}
-              </span>
-            )}
-          </div>
-        </Link>
-      ))}
+        );
+      })}
     </div>
   );
 }
 
-export function TableView({ rows }: ListViewProps) {
+export function TableView({ rows, renderAction }: ListViewProps) {
   const { t } = useTranslation("list");
+  const { t: tCollector } = useTranslation("collector");
   return (
     <div className="td-table-wrap">
       <table className="td-table">
@@ -140,6 +165,11 @@ export function TableView({ rows }: ListViewProps) {
             <th scope="col">{t("views.table.columns.signals")}</th>
             <th scope="col">{t("views.table.columns.distribution")}</th>
             <th scope="col">{t("views.table.columns.stability")}</th>
+            {renderAction && (
+              <th scope="col">
+                <span className="sr-only">{tCollector("builder.toggle.label")}</span>
+              </th>
+            )}
           </tr>
         </thead>
         <tbody>
@@ -162,6 +192,7 @@ export function TableView({ rows }: ListViewProps) {
               <td>
                 <StatusPill stability={row.stability} />
               </td>
+              {renderAction && <td className="td-table__action">{renderAction(row)}</td>}
             </tr>
           ))}
         </tbody>

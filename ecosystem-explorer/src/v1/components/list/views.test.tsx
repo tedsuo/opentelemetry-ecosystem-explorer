@@ -173,3 +173,47 @@ describe("TableView", () => {
     expect(within(kafkaRow).getByText("Alpha")).toBeInTheDocument();
   });
 });
+
+describe("row actions", () => {
+  // The Kafka row opts out, the way the list page skips removed components.
+  const renderAction = (row: ListRow) =>
+    row.id === "kafka-exporter" ? null : (
+      <button type="button">{`Act on ${row.displayName}`}</button>
+    );
+
+  it.each([
+    ["CompactList", CompactList],
+    ["CardView", CardView],
+  ])("%s renders each action beside its row's link, not inside it", (_name, View) => {
+    render(
+      <MemoryRouter>
+        <View rows={rows} renderAction={renderAction} />
+      </MemoryRouter>
+    );
+
+    const button = screen.getByRole("button", { name: "Act on OTLP Receiver" });
+    expect(screen.getAllByRole("link")).toHaveLength(rows.length);
+    expect(button.closest("a")).toBeNull();
+    expect(screen.queryByRole("button", { name: "Act on Kafka Exporter" })).not.toBeInTheDocument();
+  });
+
+  it("TableView adds a column for the actions", () => {
+    render(
+      <MemoryRouter>
+        <TableView rows={rows} renderAction={renderAction} />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByRole("columnheader", { name: "Add to build" })).toBeInTheDocument();
+    const [, otlpRow] = screen.getAllByRole("row");
+    expect(
+      within(otlpRow).getByRole("button", { name: "Act on OTLP Receiver" })
+    ).toBeInTheDocument();
+  });
+
+  it("TableView has no action column without actions", () => {
+    renderTableView();
+
+    expect(screen.getAllByRole("columnheader")).toHaveLength(5);
+  });
+});

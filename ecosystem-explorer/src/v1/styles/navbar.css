@@ -156,6 +156,45 @@
 }
 
 /*
+ * Collector Builder cart link. It follows the collapse wrapper in source order, so on
+ * desktop it sits after the nav items, and on mobile (where the wrapper is an
+ * out-of-flow overlay) it sits after the hamburger, visible at every width.
+ */
+.td-navbar-cart {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8px;
+  padding: 8px;
+  color: hsl(var(--navbar-fg-hsl));
+  text-decoration: none;
+}
+
+.td-navbar-cart:hover {
+  color: hsl(var(--navbar-accent-hsl));
+}
+
+.td-navbar-cart:focus-visible {
+  outline: revert;
+}
+
+.td-navbar-cart__count {
+  position: absolute;
+  top: 0;
+  right: -2px;
+  min-width: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  /* Same pairing as `.td-btn--primary`: navy on orange falls short of AA for small text. */
+  background-color: hsl(var(--navbar-accent-hsl));
+  color: #000;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+}
+
+/*
  * Backdrop — hidden on desktop, fades in behind the open panel on mobile so
  * the user's focus collapses onto the menu. Clicking it dismisses the panel
  * (handler lives in `nav-bar.tsx`).

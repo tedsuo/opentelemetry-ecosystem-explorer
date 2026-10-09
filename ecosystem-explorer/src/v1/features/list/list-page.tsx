@@ -42,6 +42,8 @@ import {
   useCollectorDeprecations,
   useCollectorVersions,
 } from "@/hooks/use-collector-data";
+import { CollectorBuildToggle } from "@/features/collector/builder/collector-build-toggle";
+import { isEnabled } from "@/lib/feature-flags";
 import type { DeprecatedIndexComponent, IndexComponent } from "@/types/collector";
 import { SubNav } from "@/v1/components/layout/sub-nav";
 import {
@@ -166,6 +168,16 @@ function computeCounts(rows: ListRow[]): FacetCounts {
   return counts;
 }
 
+function renderBuildToggle(row: ListRow) {
+  return (
+    <CollectorBuildToggle
+      componentId={row.id}
+      componentName={row.displayName}
+      className="td-build-toggle"
+    />
+  );
+}
+
 export function CollectorListPageV1() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -212,6 +224,9 @@ export function CollectorListPageV1() {
   );
   const currentVersion = filters.version ?? "";
   const deprecatedView = release.deprecated;
+  // Removed components can't be built, so the deprecated view has no build toggles.
+  const rowAction =
+    isEnabled("COLLECTOR_BUILDER") && !deprecatedView ? renderBuildToggle : undefined;
   const allVersions = useMemo(() => {
     if (!versionsData?.versions) return undefined;
     if (filters.distributions.length === 1) {
@@ -336,9 +351,15 @@ export function CollectorListPageV1() {
 
             {!error && !loading && filteredRows.length > 0 && (
               <>
-                {filters.density === "cards" && <CardView rows={pagedRows} />}
-                {filters.density === "compact" && <CompactList rows={pagedRows} />}
-                {filters.density === "table" && <TableView rows={pagedRows} />}
+                {filters.density === "cards" && (
+                  <CardView rows={pagedRows} renderAction={rowAction} />
+                )}
+                {filters.density === "compact" && (
+                  <CompactList rows={pagedRows} renderAction={rowAction} />
+                )}
+                {filters.density === "table" && (
+                  <TableView rows={pagedRows} renderAction={rowAction} />
+                )}
                 <Pagination
                   page={safePage}
                   totalPages={totalPages}

@@ -307,4 +307,36 @@ describe("CollectorListPageV1", () => {
     expect(window.localStorage.getItem("explorer:listDensity")).toBe("cards");
     expect(screen.queryByRole("table")).not.toBeInTheDocument();
   });
+
+  describe("with the Collector Builder enabled", () => {
+    beforeEach(() => {
+      vi.stubEnv("VITE_FEATURE_FLAG_COLLECTOR_BUILDER", "true");
+    });
+
+    afterEach(() => {
+      vi.unstubAllEnvs();
+    });
+
+    it("puts an add-to-build toggle beside each row, outside its link", async () => {
+      const user = userEvent.setup();
+      renderPage();
+
+      const toggle = screen.getByRole("button", { name: "Add OTLP Receiver to build" });
+      expect(toggle.closest("a")).toBeNull();
+      await user.click(toggle);
+      expect(toggle).toHaveAttribute("aria-pressed", "true");
+    });
+
+    it("offers no toggles in the deprecated view", () => {
+      vi.mocked(useCollectorDeprecations).mockReturnValue({
+        data: { ecosystem: "collector", components: [deprecatedComponent] },
+        loading: false,
+        error: null,
+      });
+
+      renderPage("/collector/components?version=deprecated");
+
+      expect(screen.queryByRole("button", { name: /to build$/ })).not.toBeInTheDocument();
+    });
+  });
 });

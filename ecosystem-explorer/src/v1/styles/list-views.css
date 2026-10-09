@@ -35,6 +35,29 @@
   background-color: hsl(var(--card-hsl));
 }
 
+/*
+ * Each row link sits in an item wrapper that also holds the row's optional action (a
+ * button can't nest inside the link), so striping, separators and hover live on the
+ * wrapper.
+ */
+.td-row-item {
+  position: relative;
+  border-bottom: 1px solid hsl(var(--border-hsl) / 0.6);
+}
+
+.td-row-item:last-child {
+  border-bottom: none;
+}
+
+.td-row-item:nth-child(odd) {
+  background-color: hsl(var(--muted-hsl) / 0.4);
+}
+
+.td-row-item:hover,
+.td-row-item:has(.td-row:focus-visible) {
+  background-color: hsl(var(--muted-hsl) / 0.8);
+}
+
 .td-row {
   position: relative;
   display: grid;
@@ -44,20 +67,18 @@
   padding: 0.625rem 0.875rem 0.625rem 0.5rem;
   text-decoration: none;
   color: inherit;
-  border-bottom: 1px solid hsl(var(--border-hsl) / 0.6);
 }
 
-.td-row:last-child {
-  border-bottom: none;
+/* Room for the action, which overlays the row's right edge. */
+.td-row-item--with-action .td-row {
+  padding-right: 3.25rem;
 }
 
-.td-row:nth-child(odd) {
-  background-color: hsl(var(--muted-hsl) / 0.4);
-}
-
-.td-row:hover,
-.td-row:focus-visible {
-  background-color: hsl(var(--muted-hsl) / 0.8);
+.td-row__action {
+  position: absolute;
+  top: 50%;
+  right: 0.875rem;
+  transform: translateY(-50%);
 }
 
 .td-row__stripe {
@@ -136,6 +157,27 @@
     transform 0.15s ease,
     border-color 0.15s ease,
     box-shadow 0.15s ease;
+}
+
+.td-card-item {
+  position: relative;
+  display: flex;
+}
+
+.td-card-item > .td-card {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Room for the action, which overlays the card's top-right corner. */
+.td-card-item--with-action .td-card__head {
+  padding-right: 2.5rem;
+}
+
+.td-card__action {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
 }
 
 .td-card__stripe {
@@ -241,6 +283,12 @@
   gap: 0.5rem;
   text-decoration: none;
   color: inherit;
+}
+
+.td-table__action {
+  width: 1%;
+  text-align: right;
+  white-space: nowrap;
 }
 
 .td-table__dot {

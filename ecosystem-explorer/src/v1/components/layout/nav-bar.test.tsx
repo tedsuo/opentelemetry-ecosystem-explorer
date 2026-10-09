@@ -15,7 +15,7 @@
  */
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import { describe, it, expect } from "vitest";
+import { afterEach, describe, it, expect, vi } from "vitest";
 import { NavBar } from "./nav-bar";
 import { ThemeProvider } from "@/theme-context";
 
@@ -101,5 +101,41 @@ describe("NavBar", () => {
     });
 
     expect(toggler).toHaveAttribute("aria-expanded", "false");
+  });
+});
+
+describe("NavBar Collector build link", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    localStorage.clear();
+  });
+
+  it("links to the Collector Builder when the builder is enabled", () => {
+    vi.stubEnv("VITE_FEATURE_FLAG_COLLECTOR_BUILDER", "true");
+    renderNavBar();
+
+    expect(screen.getByRole("link", { name: "Collector build, empty" })).toHaveAttribute(
+      "href",
+      "/collector/builder"
+    );
+  });
+
+  it("closes the mobile menu when followed", () => {
+    vi.stubEnv("VITE_FEATURE_FLAG_COLLECTOR_BUILDER", "true");
+    renderNavBar();
+    const toggler = screen.getByRole("button", { name: /toggle navigation/i });
+
+    fireEvent.click(toggler);
+    expect(toggler).toHaveAttribute("aria-expanded", "true");
+    fireEvent.click(screen.getByRole("link", { name: "Collector build, empty" }));
+
+    expect(toggler).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("is absent while the builder is disabled", () => {
+    vi.stubEnv("VITE_FEATURE_FLAG_COLLECTOR_BUILDER", "false");
+    renderNavBar();
+
+    expect(screen.queryByRole("link", { name: /Collector build/ })).not.toBeInTheDocument();
   });
 });

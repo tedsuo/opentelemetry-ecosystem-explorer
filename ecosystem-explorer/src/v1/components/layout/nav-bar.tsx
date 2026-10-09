@@ -16,6 +16,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { CollectorBuildCartLink } from "@/features/collector/builder/collector-build-cart-link";
 import { OpenTelemetryWordmark } from "@/v1/components/icons/opentelemetry-wordmark";
 import { LanguageToggle } from "@/v1/components/ui/language-toggle";
 import { ThemeToggle } from "@/v1/components/ui/theme-toggle";
@@ -129,6 +130,11 @@ export function NavBar() {
             </nav>
           </div>
         </div>
+        <CollectorBuildCartLink
+          className="td-navbar-cart"
+          countClassName="td-navbar-cart__count"
+          onClick={() => setIsOpen(false)}
+        />
       </div>
     </header>
   );
