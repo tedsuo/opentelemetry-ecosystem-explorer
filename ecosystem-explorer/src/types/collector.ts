@@ -46,9 +46,24 @@ export interface VersionManifest {
 export type Stability = "alpha" | "beta" | "stable" | "deprecated" | "unmaintained" | "development";
 
 /**
+ * What an OCB manifest needs to include a component, and the keys a Collector config file
+ * uses to reference it. Optional: cached data and deprecated entries can predate these fields.
+ */
+export interface CollectorBuildMetadata {
+  /** The key a Collector config file uses for this component (e.g., otlp_grpc). */
+  config_type?: string;
+  /** The key the component used before a rename (e.g., otlp), which config files may still use. */
+  deprecated_config_type?: string;
+  /** The component's Go module path (e.g., go.opentelemetry.io/collector/receiver/otlpreceiver). */
+  go_module?: string;
+  /** The Go module's version in this release, which can differ from the release version (e.g., v1.0.0). */
+  go_module_version?: string;
+}
+
+/**
  * Core metadata for an OpenTelemetry Collector component.
  */
-export interface CollectorComponent {
+export interface CollectorComponent extends CollectorBuildMetadata {
   /** Unique identifier for the component (e.g., core-receiver-otlpreceiver). */
   id: string;
   /** The short name of the component (e.g., otlpreceiver). */
@@ -213,7 +228,7 @@ export interface CollectorDeprecationsIndex {
   components: DeprecatedIndexComponent[];
 }
 
-export interface IndexComponent {
+export interface IndexComponent extends CollectorBuildMetadata {
   id: string;
   name: string;
   distribution: string;

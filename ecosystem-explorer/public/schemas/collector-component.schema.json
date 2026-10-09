@@ -606,6 +606,22 @@
         }
       },
       "propertyOrder": ["metrics"]
+    },
+    "config_type": {
+      "description": "The key a Collector config file uses for this component (e.g., otlp_grpc).",
+      "type": "string"
+    },
+    "deprecated_config_type": {
+      "description": "The key the component used before a rename (e.g., otlp), which config files may still use.",
+      "type": "string"
+    },
+    "go_module": {
+      "description": "The component's Go module path (e.g., go.opentelemetry.io/collector/receiver/otlpreceiver).",
+      "type": "string"
+    },
+    "go_module_version": {
+      "description": "The Go module's version in this release, which can differ from the release version (e.g., v1.0.0).",
+      "type": "string"
     }
   },
   "propertyOrder": [
@@ -623,7 +639,11 @@
     "resource_attributes",
     "feature_gates",
     "markdown_hash",
-    "telemetry"
+    "telemetry",
+    "config_type",
+    "deprecated_config_type",
+    "go_module",
+    "go_module_version"
   ],
   "required": ["distribution", "ecosystem", "id", "name", "type"],
   "$schema": "https://json-schema.org/draft-07/schema#"

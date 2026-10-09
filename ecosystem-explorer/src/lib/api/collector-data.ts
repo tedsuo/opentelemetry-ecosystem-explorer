@@ -76,6 +76,10 @@ function toIndexComponent(component: CollectorComponent): IndexComponent {
     stability: deriveStability(component.status?.stability),
     has_readme: Boolean(component.markdown_hash),
     signals: deriveSignals(component.status?.stability),
+    config_type: component.config_type,
+    deprecated_config_type: component.deprecated_config_type,
+    go_module: component.go_module,
+    go_module_version: component.go_module_version,
   };
 }
 
