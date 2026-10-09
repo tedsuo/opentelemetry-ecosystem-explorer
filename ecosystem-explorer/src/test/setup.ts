@@ -45,6 +45,8 @@ i18n.use(initReactI18next).init({
     "semantic-conventions",
   ],
   defaultNS: "common",
+  // Matches src/i18n/config.ts: React already escapes, so i18next must not escape again.
+  interpolation: { escapeValue: false },
   resources: {
     en: {
       common: commonEn,
