@@ -325,6 +325,11 @@ class TestRunCollectorBuilder:
                 "stability",
                 "signals",
                 "has_readme",
+                "distributions",
+                "config_type",
+                "deprecated_config_type",
+                "go_module",
+                "go_module_version",
             }
             for entry in bundle
         )

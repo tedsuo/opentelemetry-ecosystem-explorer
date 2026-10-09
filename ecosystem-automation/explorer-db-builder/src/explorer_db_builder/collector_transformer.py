@@ -116,6 +116,23 @@ def transform_collector_components(
                 "status": status,
             }
 
+            # The key a Collector config file uses for this component (e.g. "otlp_grpc"),
+            # plus the alias it replaced, which configs written for older releases still use
+            config_type = metadata.get("type")
+            if config_type:
+                component["config_type"] = config_type
+            deprecated_config_type = metadata.get("deprecated_type")
+            if deprecated_config_type:
+                component["deprecated_config_type"] = deprecated_config_type
+
+            # What an OCB manifest's `gomod` entry needs, recorded by the collector watcher
+            go_module = raw.get("go_module")
+            if go_module:
+                component["go_module"] = go_module
+            go_module_version = raw.get("go_module_version")
+            if go_module_version:
+                component["go_module_version"] = go_module_version
+
             attributes = metadata.get("attributes")
             if attributes:
                 component["attributes"] = attributes
@@ -149,8 +166,9 @@ def make_index_component(component: dict[str, Any]) -> dict[str, Any]:
     Returns:
         Minimal dict suitable for the index components list.
     """
-    stability_raw = component.get("status", {}).get("stability")
-    return {
+    status = component.get("status", {})
+    stability_raw = status.get("stability")
+    index_component = {
         "id": component["id"],
         "name": component["name"],
         "distribution": component["distribution"],
@@ -161,3 +179,14 @@ def make_index_component(component: dict[str, Any]) -> dict[str, Any]:
         "signals": _derive_signals(stability_raw),
         "has_readme": bool(component.get("markdown_hash")),
     }
+
+    # The Collector Builder needs these for every component of a version at once, so they
+    # ride along in the slim entry rather than requiring a fetch per component.
+    distributions = status.get("distributions")
+    if isinstance(distributions, list):
+        index_component["distributions"] = distributions
+    for key in ("config_type", "deprecated_config_type", "go_module", "go_module_version"):
+        if component.get(key):
+            index_component[key] = component[key]
+
+    return index_component

@@ -585,3 +585,86 @@ class TestMakeIndexComponentHasReadme:
         }
         result = make_index_component(component)
         assert result["has_readme"] is False
+
+
+class TestCollectorBuilderFields:
+    """Fields the Collector Builder reads to generate OCB manifests and import configs."""
+
+    GO_MODULE = "go.opentelemetry.io/collector/exporter/otlpexporter"
+
+    def _transform_one(self, raw):
+        inventory = _make_inventory(
+            distribution="core",
+            repository="opentelemetry-collector",
+            components={
+                "exporter": [raw],
+                "receiver": [],
+                "processor": [],
+                "connector": [],
+                "extension": [],
+            },
+        )
+        (component,) = transform_collector_components(inventory, "core")
+        return component
+
+    def test_full_record_carries_config_keys_and_go_module(self):
+        component = self._transform_one(
+            {
+                "name": "otlpexporter",
+                "go_module": self.GO_MODULE,
+                "go_module_version": "v0.161.0",
+                "metadata": {
+                    "type": "otlp_grpc",
+                    "deprecated_type": "otlp",
+                    "status": {"distributions": ["contrib", "core"]},
+                },
+            }
+        )
+
+        assert component["type"] == "exporter"
+        assert component["config_type"] == "otlp_grpc"
+        assert component["deprecated_config_type"] == "otlp"
+        assert component["go_module"] == self.GO_MODULE
+        assert component["go_module_version"] == "v0.161.0"
+
+    def test_full_record_omits_fields_the_registry_lacks(self):
+        component = self._transform_one({"name": "otlpexporter", "metadata": {"status": {}}})
+
+        for key in ("config_type", "deprecated_config_type", "go_module", "go_module_version"):
+            assert key not in component
+
+    def test_index_component_carries_builder_fields(self):
+        component = self._transform_one(
+            {
+                "name": "otlpexporter",
+                "go_module": self.GO_MODULE,
+                "go_module_version": "v0.161.0",
+                "metadata": {
+                    "type": "otlp_grpc",
+                    "deprecated_type": "otlp",
+                    "status": {"distributions": ["contrib", "core", "k8s"]},
+                },
+            }
+        )
+
+        result = make_index_component(component)
+
+        assert result["distributions"] == ["contrib", "core", "k8s"]
+        assert result["config_type"] == "otlp_grpc"
+        assert result["deprecated_config_type"] == "otlp"
+        assert result["go_module"] == self.GO_MODULE
+        assert result["go_module_version"] == "v0.161.0"
+
+    def test_index_component_keeps_empty_distributions(self):
+        """An empty list means "in no distribution", which differs from unknown."""
+        component = self._transform_one({"name": "otlpexporter", "metadata": {"status": {"distributions": []}}})
+
+        assert make_index_component(component)["distributions"] == []
+
+    def test_index_component_omits_fields_the_registry_lacks(self):
+        component = self._transform_one({"name": "otlpexporter", "metadata": {"status": {}}})
+
+        result = make_index_component(component)
+
+        for key in ("distributions", "config_type", "deprecated_config_type", "go_module", "go_module_version"):
+            assert key not in result
