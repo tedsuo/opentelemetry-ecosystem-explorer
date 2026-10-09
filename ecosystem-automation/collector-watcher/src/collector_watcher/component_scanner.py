@@ -21,6 +21,8 @@ and extract their metadata from metadata.yaml files.
 from pathlib import Path
 from typing import Any
 
+import yaml
+
 from .metadata_parser import MetadataParser
 from .type_defs import COMPONENT_TYPES
 
@@ -53,6 +55,64 @@ class ComponentScanner:
         self.repo_path = Path(repo_path)
         if not self.repo_path.exists():
             raise ValueError(f"Repository path does not exist: {repo_path}")
+        self._module_versions = self._load_module_versions()
+
+    def _load_module_versions(self) -> dict[str, str]:
+        """
+        Map each Go module path to its release version, from the repository's versions.yaml.
+
+        Collector repositories release their modules in sets with independent versions (for
+        example contrib's ``stable-base`` set at v1.x alongside ``contrib-base`` at v0.x), so a
+        component's module version cannot be inferred from the release tag.
+
+        Returns:
+            Dictionary mapping module path to version (e.g. "v0.161.0"), empty when the
+            repository has no readable versions.yaml
+        """
+        versions_file = self.repo_path / "versions.yaml"
+        if not versions_file.is_file():
+            return {}
+        try:
+            data = yaml.safe_load(versions_file.read_text(encoding="utf-8")) or {}
+        except yaml.YAMLError:
+            return {}
+
+        module_sets = data.get("module-sets") if isinstance(data, dict) else None
+        if not isinstance(module_sets, dict):
+            return {}
+
+        versions = {}
+        for module_set in module_sets.values():
+            if not isinstance(module_set, dict):
+                continue
+            version = module_set.get("version")
+            modules = module_set.get("modules")
+            if not isinstance(version, str) or not isinstance(modules, list):
+                continue
+            for module in modules:
+                if isinstance(module, str):
+                    versions[module] = version
+        return versions
+
+    @staticmethod
+    def _read_go_module_path(component_path: Path) -> str | None:
+        """
+        Read the module path declared by a component directory's own go.mod.
+
+        Args:
+            component_path: Path to the component directory
+
+        Returns:
+            The module path, or None when the directory has no go.mod or it declares no module
+        """
+        go_mod = component_path / "go.mod"
+        if not go_mod.is_file():
+            return None
+        for line in go_mod.read_text(encoding="utf-8").splitlines():
+            parts = line.split("//", 1)[0].split()
+            if len(parts) == 2 and parts[0] == "module":
+                return parts[1].strip('"')
+        return None
 
     def scan_all_components(self) -> dict[str, list[dict[str, Any]]]:
         """
@@ -218,6 +278,14 @@ class ComponentScanner:
         # Add subtype if this is a nested component
         if subtype:
             component_info["subtype"] = subtype
+
+        # The module path and version are what an OCB manifest's `gomod` entry needs
+        go_module = self._read_go_module_path(component_path)
+        if go_module:
+            component_info["go_module"] = go_module
+            module_version = self._module_versions.get(go_module)
+            if module_version:
+                component_info["go_module_version"] = module_version
 
         if has_metadata:
             parsed_metadata = parser.parse()

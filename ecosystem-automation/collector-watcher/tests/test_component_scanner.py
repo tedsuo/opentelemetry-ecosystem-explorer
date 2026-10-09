@@ -415,3 +415,129 @@ def test_excludes_known_pkg_class_interface_packages(tmp_path, component_type, n
     components = scanner.scan_component_type(component_type)
 
     assert components == []
+
+
+CONTRIB_MODULE = "github.com/open-telemetry/opentelemetry-collector-contrib"
+
+VERSIONS_YAML = f"""
+module-sets:
+  stable-base:
+    version: v1.0.0
+    modules:
+      - {CONTRIB_MODULE}/processor/k8sattributesprocessor
+  contrib-base:
+    version: v0.161.0
+    modules:
+      - {CONTRIB_MODULE}/receiver/filelogreceiver
+      - {CONTRIB_MODULE}/extension/storage/filestorage
+excluded-modules:
+  - {CONTRIB_MODULE}/internal/tools
+"""
+
+
+def _write_component(repo_path, rel_path, go_mod=None, metadata="type: test"):
+    component_dir = repo_path / rel_path
+    component_dir.mkdir(parents=True)
+    if go_mod is None:
+        (component_dir / "component.go").touch()
+    else:
+        (component_dir / "go.mod").write_text(go_mod)
+    (component_dir / "metadata.yaml").write_text(metadata)
+    return component_dir
+
+
+@pytest.fixture
+def mock_repo_with_modules(tmp_path):
+    """Create a mock repository whose components declare Go modules listed in versions.yaml."""
+    (tmp_path / "versions.yaml").write_text(VERSIONS_YAML)
+    _write_component(
+        tmp_path,
+        "processor/k8sattributesprocessor",
+        go_mod=f"module {CONTRIB_MODULE}/processor/k8sattributesprocessor\n\ngo 1.26.0\n",
+    )
+    _write_component(
+        tmp_path,
+        "receiver/filelogreceiver",
+        go_mod=f"// Code comment\nmodule {CONTRIB_MODULE}/receiver/filelogreceiver // trailing\n",
+    )
+    _write_component(
+        tmp_path,
+        "receiver/unlistedreceiver",
+        go_mod=f'module "{CONTRIB_MODULE}/receiver/unlistedreceiver"\n',
+    )
+    _write_component(tmp_path, "receiver/emptymodreceiver", go_mod="")
+    _write_component(tmp_path, "receiver/nomodreceiver")
+    _write_component(
+        tmp_path,
+        "extension/storage/filestorage",
+        go_mod=f"module {CONTRIB_MODULE}/extension/storage/filestorage\n",
+    )
+    return tmp_path
+
+
+def _by_name(components):
+    return {c["name"]: c for c in components}
+
+
+def test_go_module_version_comes_from_its_module_set(mock_repo_with_modules):
+    """Components in different module sets get different versions, e.g. v1.x vs v0.x."""
+    scanner = ComponentScanner(str(mock_repo_with_modules))
+
+    processor = _by_name(scanner.scan_component_type("processor"))["k8sattributesprocessor"]
+    receiver = _by_name(scanner.scan_component_type("receiver"))["filelogreceiver"]
+
+    assert processor["go_module"] == f"{CONTRIB_MODULE}/processor/k8sattributesprocessor"
+    assert processor["go_module_version"] == "v1.0.0"
+    assert receiver["go_module"] == f"{CONTRIB_MODULE}/receiver/filelogreceiver"
+    assert receiver["go_module_version"] == "v0.161.0"
+
+
+def test_go_module_for_nested_component(mock_repo_with_modules):
+    scanner = ComponentScanner(str(mock_repo_with_modules))
+    filestorage = _by_name(scanner.scan_component_type("extension"))["filestorage"]
+
+    assert filestorage["subtype"] == "storage"
+    assert filestorage["go_module"] == f"{CONTRIB_MODULE}/extension/storage/filestorage"
+    assert filestorage["go_module_version"] == "v0.161.0"
+
+
+def test_go_module_fields_precede_metadata(mock_repo_with_modules):
+    """Key order is the registry YAML's field order, so module fields sit beside the name."""
+    scanner = ComponentScanner(str(mock_repo_with_modules))
+    filestorage = _by_name(scanner.scan_component_type("extension"))["filestorage"]
+
+    assert list(filestorage) == ["name", "subtype", "go_module", "go_module_version", "metadata"]
+
+
+def test_go_module_without_versions_entry_has_no_version(mock_repo_with_modules):
+    scanner = ComponentScanner(str(mock_repo_with_modules))
+    receiver = _by_name(scanner.scan_component_type("receiver"))["unlistedreceiver"]
+
+    assert receiver["go_module"] == f"{CONTRIB_MODULE}/receiver/unlistedreceiver"
+    assert "go_module_version" not in receiver
+
+
+def test_component_without_module_declaration_has_no_go_module(mock_repo_with_modules):
+    scanner = ComponentScanner(str(mock_repo_with_modules))
+    receivers = _by_name(scanner.scan_component_type("receiver"))
+
+    for name in ("emptymodreceiver", "nomodreceiver"):
+        assert "go_module" not in receivers[name]
+        assert "go_module_version" not in receivers[name]
+
+
+@pytest.mark.parametrize("versions_yaml", [None, "module-sets: [not, a, mapping]", "{unclosed: ["])
+def test_missing_or_invalid_versions_yaml_keeps_module_path(tmp_path, versions_yaml):
+    if versions_yaml is not None:
+        (tmp_path / "versions.yaml").write_text(versions_yaml)
+    _write_component(
+        tmp_path,
+        "receiver/filelogreceiver",
+        go_mod=f"module {CONTRIB_MODULE}/receiver/filelogreceiver\n",
+    )
+
+    scanner = ComponentScanner(str(tmp_path))
+    (receiver,) = scanner.scan_component_type("receiver")
+
+    assert receiver["go_module"] == f"{CONTRIB_MODULE}/receiver/filelogreceiver"
+    assert "go_module_version" not in receiver

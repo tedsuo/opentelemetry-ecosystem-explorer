@@ -11,6 +11,9 @@ Process:
 
 - Clone or update local copies of the `core` and `contrib` collector repositories.
 - Scan for components and parse their `metadata.yaml` files.
+- Record each component's Go module path (from its own `go.mod`) and module version (from the
+  repository's `versions.yaml`), which an OCB manifest needs. Module versions can differ from the
+  release tag: for example, contrib's `stable-base` modules are released at v1.x.
 - Create or update versioned snapshots of component metadata in YAML format.
 - Store the upstream `metadata-schema.yaml` in content-addressed storage under
   `ecosystem-registry/collector/meta/schemas/{hash}.yaml`.
