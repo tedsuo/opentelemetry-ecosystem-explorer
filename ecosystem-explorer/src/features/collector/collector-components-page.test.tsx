@@ -16,7 +16,7 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { CollectorComponentsPage } from "./collector-components-page";
 import {
@@ -493,5 +493,39 @@ describe("CollectorComponentsPage", () => {
     renderPage();
 
     expect(screen.getByText("/metrics/json").tagName).toBe("CODE");
+  });
+
+  describe("with the Collector Builder enabled", () => {
+    beforeEach(() => {
+      localStorage.clear();
+      vi.stubEnv("VITE_FEATURE_FLAG_COLLECTOR_BUILDER", "true");
+    });
+
+    afterEach(() => {
+      vi.unstubAllEnvs();
+    });
+
+    it("puts an add-to-build toggle beside each card, outside its link", async () => {
+      const user = userEvent.setup();
+      renderPage();
+
+      const toggle = screen.getByRole("button", { name: "Add OTLP Receiver to build" });
+      expect(toggle.closest("a")).toBeNull();
+      await user.click(toggle);
+      expect(toggle).toHaveAttribute("aria-pressed", "true");
+    });
+
+    it("offers no toggle on removed components", () => {
+      vi.mocked(useCollectorDeprecations).mockReturnValue({
+        data: { ecosystem: "collector", components: [deprecatedComponent] },
+        loading: false,
+        error: null,
+      });
+
+      renderPage("/collector/components?version=deprecated");
+
+      expect(screen.getByText("JMX Receiver")).toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: /to build$/ })).not.toBeInTheDocument();
+    });
   });
 });

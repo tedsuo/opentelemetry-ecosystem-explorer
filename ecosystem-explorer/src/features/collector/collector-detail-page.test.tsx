@@ -16,7 +16,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { CollectorDetailPage } from "./collector-detail-page";
 import {
@@ -631,5 +631,37 @@ describe("CollectorDetailPage", () => {
       "href",
       "https://github.com/open-telemetry/opentelemetry-collector/tree/v0.150.0/receiver/otlpreceiver"
     );
+  });
+
+  describe("with the Collector Builder enabled", () => {
+    beforeEach(() => {
+      localStorage.clear();
+      vi.stubEnv("VITE_FEATURE_FLAG_COLLECTOR_BUILDER", "true");
+      vi.mocked(useCollectorVersions).mockReturnValue({
+        data: { versions: [{ version: "0.150.0", is_latest: true }] },
+        loading: false,
+        error: null,
+      });
+      vi.mocked(useCollectorComponent).mockReturnValue({
+        data: mockComponentWithoutTelemetry,
+        loading: false,
+        error: null,
+      });
+    });
+
+    afterEach(() => {
+      vi.unstubAllEnvs();
+    });
+
+    it("adds the component to the build from the header", async () => {
+      const user = userEvent.setup();
+      renderAtRoute("/collector/components/core/otlpreceiver");
+
+      const toggle = screen.getByRole("button", { name: "Add to build" });
+      await user.click(toggle);
+
+      expect(toggle).toHaveAttribute("aria-pressed", "true");
+      expect(localStorage.getItem("explorer:collectorBuild:v1")).toContain("core-otlpreceiver");
+    });
   });
 });

@@ -16,7 +16,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
-import { describe, it, expect } from "vitest";
+import { afterEach, describe, it, expect, vi } from "vitest";
 import { ThemeProvider } from "@/theme-context";
 import { Header } from "./header";
 
@@ -195,5 +195,39 @@ describe("Header", () => {
 
     expect(localStorage.getItem("td-color-theme")).toBe("dark");
     expect(document.documentElement.dataset.theme).toBe("dark");
+  });
+});
+
+function renderHeader() {
+  return render(
+    <MemoryRouter>
+      <ThemeProvider>
+        <Header />
+      </ThemeProvider>
+    </MemoryRouter>
+  );
+}
+
+describe("Header Collector build link", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    localStorage.clear();
+  });
+
+  it("links to the Collector Builder when the builder is enabled", () => {
+    vi.stubEnv("VITE_FEATURE_FLAG_COLLECTOR_BUILDER", "true");
+    renderHeader();
+
+    expect(screen.getByRole("link", { name: "Collector build, empty" })).toHaveAttribute(
+      "href",
+      "/collector/builder"
+    );
+  });
+
+  it("is absent while the builder is disabled", () => {
+    vi.stubEnv("VITE_FEATURE_FLAG_COLLECTOR_BUILDER", "false");
+    renderHeader();
+
+    expect(screen.queryByRole("link", { name: /Collector build/ })).not.toBeInTheDocument();
   });
 });

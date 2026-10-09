@@ -19,6 +19,7 @@ import { Menu, X, Sun, Moon, Monitor, ChevronDown } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { OtelLogo } from "@/components/icons/otel-logo";
+import { CollectorBuildCartLink } from "@/features/collector/builder/collector-build-cart-link";
 import { LANGUAGES } from "@/i18n/languages";
 import { useTheme, type ThemeMode } from "@/theme-context";
 
@@ -112,29 +113,35 @@ export function Header() {
             <OtelLogo className="text-primary h-6 w-6" />
             <span className="text-foreground font-semibold">{t("header.title")}</span>
           </Link>
-          <nav aria-label="Main" className="hidden items-center gap-8 md:flex">
-            {NAV_ITEMS.map((item) => (
-              <Link
-                key={item.to}
-                to={item.to}
-                className="text-muted-foreground hover:text-foreground text-sm transition-colors"
-              >
-                {t(item.labelKey)}
-              </Link>
-            ))}
-            <LanguageSwitcher />
-            <ThemeSwitcher />
-          </nav>
-          <button
-            type="button"
-            aria-label={menuOpen ? "Close menu" : "Open menu"}
-            aria-expanded={menuOpen}
-            aria-controls="mobile-nav"
-            className="text-muted-foreground hover:text-foreground md:hidden"
-            onClick={menuOpen ? closeMenu : openMenu}
-          >
-            {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
+          <div className="flex items-center gap-4 md:gap-8">
+            <nav aria-label="Main" className="hidden items-center gap-8 md:flex">
+              {NAV_ITEMS.map((item) => (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+                >
+                  {t(item.labelKey)}
+                </Link>
+              ))}
+              <LanguageSwitcher />
+              <ThemeSwitcher />
+            </nav>
+            <CollectorBuildCartLink
+              className="text-muted-foreground hover:text-foreground focus-visible:ring-primary relative inline-flex items-center rounded p-1 transition-colors focus-visible:ring-2 focus-visible:outline-none"
+              countClassName="bg-primary text-primary-foreground absolute -top-1.5 -right-2 min-w-[1.125rem] rounded-full px-1 text-center text-[10px] leading-[1.125rem] font-bold"
+            />
+            <button
+              type="button"
+              aria-label={menuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={menuOpen}
+              aria-controls="mobile-nav"
+              className="text-muted-foreground hover:text-foreground md:hidden"
+              onClick={menuOpen ? closeMenu : openMenu}
+            >
+              {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
         </div>
         <nav
           id="mobile-nav"

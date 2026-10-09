@@ -35,6 +35,8 @@ import { BackButton } from "@/components/ui/back-button";
 import { GlowBadge } from "@/components/ui/glow-badge";
 import { DetailCard } from "@/components/ui/detail-card";
 import { SignalBadge } from "@/components/ui/signal-badge";
+import { CollectorBuildToggle } from "./builder/collector-build-toggle";
+import { LEGACY_ICON_TOGGLE_CLASS } from "./builder/styles";
 import { renderWithInlineCode } from "@/lib/render-inline-code";
 import {
   useCollectorComponents,
@@ -566,93 +568,103 @@ function CollectorComponentsContent({ urlVersion }: { urlVersion?: string }) {
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {filteredComponents.length > 0 ? (
               filteredComponents.map((comp) => (
-                <Link
-                  key={comp.id}
-                  to={getDetailLink(comp)}
-                  className="group focus-visible:ring-primary block rounded-xl outline-none focus-visible:ring-2"
-                >
-                  <DetailCard
-                    withHoverEffect
-                    className="border-border/50 group-hover:border-primary/30 h-full transition-colors"
+                <div key={comp.id} className="relative">
+                  <Link
+                    to={getDetailLink(comp)}
+                    className="group focus-visible:ring-primary block h-full rounded-xl outline-none focus-visible:ring-2"
                   >
-                    <div className="flex h-full flex-col space-y-4">
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="bg-primary/10 text-primary flex h-10 w-10 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110">
-                            {getIcon(comp.type)}
+                    <DetailCard
+                      withHoverEffect
+                      className="border-border/50 group-hover:border-primary/30 h-full transition-colors"
+                    >
+                      <div className="flex h-full flex-col space-y-4">
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="bg-primary/10 text-primary flex h-10 w-10 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110">
+                              {getIcon(comp.type)}
+                            </div>
+                            <div className="space-y-1">
+                              <GlowBadge
+                                variant="muted"
+                                className="text-[10px] font-bold tracking-widest uppercase"
+                              >
+                                {comp.type}
+                              </GlowBadge>
+                            </div>
                           </div>
-                          <div className="space-y-1">
-                            <GlowBadge
-                              variant="muted"
-                              className="text-[10px] font-bold tracking-widest uppercase"
-                            >
-                              {comp.type}
-                            </GlowBadge>
-                          </div>
-                        </div>
-                        <ChevronRight
-                          className="text-muted-foreground/40 h-5 w-5 opacity-0 transition-all duration-300 group-hover:translate-x-1 group-hover:opacity-100"
-                          aria-hidden="true"
-                        />
-                      </div>
-
-                      <div className="space-y-1.5">
-                        <h3 className="group-hover:text-primary text-lg leading-tight font-bold transition-colors">
-                          {comp.display_name || comp.name}
-                        </h3>
-                        <div className="flex items-center gap-2">
-                          <code className="text-muted-foreground bg-muted/50 rounded px-1.5 py-0.5 font-mono text-[11px]">
-                            {comp.name}
-                          </code>
-                          <span className="text-muted-foreground/60 text-[10px] font-medium tracking-tighter uppercase">
-                            {comp.distribution}
-                          </span>
-                        </div>
-                      </div>
-
-                      <p className="text-muted-foreground/80 line-clamp-3 flex-1 text-sm leading-relaxed">
-                        {comp.description
-                          ? renderWithInlineCode(comp.description)
-                          : t("card.defaultDescription")}
-                      </p>
-
-                      <div className="border-border/10 flex flex-wrap items-center gap-2 border-t pt-2">
-                        {(deprecatedView || comp.stability) && (
-                          <GlowBadge
-                            variant={
-                              deprecatedView
-                                ? "warning"
-                                : comp.stability === "stable"
-                                  ? "success"
-                                  : "info"
-                            }
-                            className="px-2 py-0 text-[9px]"
-                          >
-                            {deprecatedView ? t("filters.stability.deprecated") : comp.stability}
-                          </GlowBadge>
-                        )}
-                        {deprecatedView && "deprecated_in_version" in comp && (
-                          <span className="text-muted-foreground text-xs">
-                            {tList("deprecated.removedIn", {
-                              version: comp.deprecated_in_version,
-                            })}
-                          </span>
-                        )}
-                        {getPresentSignals(comp).map((signal) => (
-                          <SignalBadge
-                            key={signal}
-                            label={t(`card.badges.${signal}.label`)}
-                            tooltip={t(`card.badges.${signal}.tooltip`)}
-                            ariaLabel={t(`card.badges.${signal}.ariaLabel`)}
-                            active={false}
-                            styles={SIGNAL_STYLES[signal]}
-                            size="compact"
+                          <ChevronRight
+                            className="text-muted-foreground/40 h-5 w-5 opacity-0 transition-all duration-300 group-hover:translate-x-1 group-hover:opacity-100"
+                            aria-hidden="true"
                           />
-                        ))}
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <h3 className="group-hover:text-primary text-lg leading-tight font-bold transition-colors">
+                            {comp.display_name || comp.name}
+                          </h3>
+                          <div className="flex items-center gap-2">
+                            <code className="text-muted-foreground bg-muted/50 rounded px-1.5 py-0.5 font-mono text-[11px]">
+                              {comp.name}
+                            </code>
+                            <span className="text-muted-foreground/60 text-[10px] font-medium tracking-tighter uppercase">
+                              {comp.distribution}
+                            </span>
+                          </div>
+                        </div>
+
+                        <p className="text-muted-foreground/80 line-clamp-3 flex-1 text-sm leading-relaxed">
+                          {comp.description
+                            ? renderWithInlineCode(comp.description)
+                            : t("card.defaultDescription")}
+                        </p>
+
+                        <div
+                          className={`border-border/10 flex flex-wrap items-center gap-2 border-t pt-2 ${deprecatedView ? "" : "pr-10"}`}
+                        >
+                          {(deprecatedView || comp.stability) && (
+                            <GlowBadge
+                              variant={
+                                deprecatedView
+                                  ? "warning"
+                                  : comp.stability === "stable"
+                                    ? "success"
+                                    : "info"
+                              }
+                              className="px-2 py-0 text-[9px]"
+                            >
+                              {deprecatedView ? t("filters.stability.deprecated") : comp.stability}
+                            </GlowBadge>
+                          )}
+                          {deprecatedView && "deprecated_in_version" in comp && (
+                            <span className="text-muted-foreground text-xs">
+                              {tList("deprecated.removedIn", {
+                                version: comp.deprecated_in_version,
+                              })}
+                            </span>
+                          )}
+                          {getPresentSignals(comp).map((signal) => (
+                            <SignalBadge
+                              key={signal}
+                              label={t(`card.badges.${signal}.label`)}
+                              tooltip={t(`card.badges.${signal}.tooltip`)}
+                              ariaLabel={t(`card.badges.${signal}.ariaLabel`)}
+                              active={false}
+                              styles={SIGNAL_STYLES[signal]}
+                              size="compact"
+                            />
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  </DetailCard>
-                </Link>
+                    </DetailCard>
+                  </Link>
+                  {!deprecatedView && (
+                    <CollectorBuildToggle
+                      componentId={comp.id}
+                      componentName={comp.display_name || comp.name}
+                      className={`${LEGACY_ICON_TOGGLE_CLASS} absolute right-4 bottom-4 z-20`}
+                    />
+                  )}
+                </div>
               ))
             ) : (
               <div className="border-border/40 col-span-full rounded-2xl border-2 border-dashed py-32 text-center">

@@ -47,6 +47,8 @@ import {
 import { CollectorTelemetryTab } from "./components/collector-telemetry-tab";
 import { CollectorFeatureGatesTab } from "./components/collector-feature-gates-tab";
 import { CollectorReadmeTab } from "./components/collector-readme-tab";
+import { CollectorBuildToggle } from "./builder/collector-build-toggle";
+import { LEGACY_LABEL_TOGGLE_CLASS } from "./builder/styles";
 import { TelemetryComparisonSection } from "./components/telemetry-comparison/telemetry-comparison-section";
 
 const getBadgeVariant = (level: string): "success" | "info" | "warning" | "muted" => {
@@ -265,6 +267,14 @@ export function CollectorDetailPage() {
                   </code>
                 </p>
               </div>
+              {!deprecatedView && (
+                <CollectorBuildToggle
+                  componentId={component.id}
+                  componentName={component.display_name || component.name}
+                  showLabel
+                  className={LEGACY_LABEL_TOGGLE_CLASS}
+                />
+              )}
             </div>
 
             {component.description && (
