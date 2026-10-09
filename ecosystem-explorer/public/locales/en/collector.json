@@ -465,5 +465,135 @@
     },
     "loading": "Loading Collector ecosystem data...",
     "error": "Error loading Collector data"
+  },
+  "builder": {
+    "title": "Collector Builder",
+    "description": "Pick the components for a custom OpenTelemetry Collector distribution, then get the OpenTelemetry Collector Builder (OCB) manifest that builds it.",
+    "privacyNote": "Your build is saved only in this browser. Nothing is sent to a server, and you don't need an account.",
+    "toggle": {
+      "label": "Add to build",
+      "ariaLabel": "Add {{name}} to build",
+      "titleAdd": "Add to your Collector build",
+      "titleRemove": "In your Collector build. Select to remove it."
+    },
+    "cart": {
+      "ariaLabel_zero": "Collector build, empty",
+      "ariaLabel_one": "Collector build, {{count}} component",
+      "ariaLabel_other": "Collector build, {{count}} components"
+    },
+    "page": {
+      "loading": "Loading Collector components…",
+      "error": "Couldn't load Collector components. Try reloading the page.",
+      "settingsHeading": "Distribution",
+      "nameLabel": "Name",
+      "nameHelp": "Sets dist.name, the file name of the Collector binary.",
+      "nameError": "Use lowercase letters and numbers, with single dots, dashes, or underscores between them.",
+      "versionLabel": "Collector version",
+      "versionValue": "v{{version}}, the newest release of both core and contrib",
+      "componentsHeading": "Components",
+      "componentCount_one": "{{count}} component",
+      "componentCount_other": "{{count}} components",
+      "pickerLabel": "Add components",
+      "pickerPlaceholder": "Search components to add",
+      "emptyTitle": "Your build is empty",
+      "emptyDescription": "Add components from the component list, or start from an OCB manifest, a Collector config, or a pre-built distribution.",
+      "browseComponents": "Browse components",
+      "removeAriaLabel": "Remove {{name}} from build",
+      "clear": "Remove all",
+      "clearConfirm": "Remove all components from your build?",
+      "unavailableHeading": "Not in v{{version}}",
+      "unavailableDescription": "These components aren't part of the latest release, so the manifest leaves them out.",
+      "missingModule": "No Go module data yet, so the manifest leaves this out.",
+      "build": "Build",
+      "buildHint": "Add a component that can go in the manifest to build."
+    },
+    "import": {
+      "heading": "Start from",
+      "submit": "Add to build",
+      "cancel": "Cancel",
+      "done": "Done",
+      "added_zero": "No new components. Everything recognized is already in your build.",
+      "added_one": "Added {{count}} component to your build.",
+      "added_other": "Added {{count}} components to your build.",
+      "nameSet": "Distribution name set to {{name}}.",
+      "unrecognizedHeading": "Not recognized, so not added:",
+      "errors": {
+        "empty": "Paste a file to import.",
+        "invalid-yaml": "This isn't valid YAML.",
+        "not-a-mapping": "Expected a YAML mapping at the top level of the file."
+      },
+      "manifest": {
+        "button": "OCB manifest",
+        "title": "Import an OCB manifest",
+        "description": "Paste a builder-config.yaml. Its receivers, processors, exporters, connectors, and extensions are added to your build, and its dist.name becomes your distribution name.",
+        "label": "OCB manifest",
+        "skippedNote": "Providers, converters, and replace directives aren't imported.",
+        "noComponents": "No receivers, processors, exporters, connectors, or extensions lists with gomod entries were found."
+      },
+      "config": {
+        "button": "Collector config",
+        "title": "Import a Collector config",
+        "description": "Paste a Collector configuration file. Every component it configures is added to your build.",
+        "label": "Collector config",
+        "noComponents": "No receivers, processors, exporters, connectors, or extensions sections were found."
+      }
+    },
+    "distributions": {
+      "button": "Pre-built distribution",
+      "title": "Start from a pre-built distribution",
+      "description": "Add the components of an official OpenTelemetry Collector distribution. Membership comes from each component's metadata, so it can differ slightly from the distribution's release manifest.",
+      "add_one": "Add {{count}} component",
+      "add_other": "Add {{count}} components",
+      "addAriaLabel_one": "Add {{count}} component from {{name}}",
+      "addAriaLabel_other": "Add {{count}} components from {{name}}",
+      "otelcol": "The core distribution: OTLP plus a set of widely used components.",
+      "otelcol-contrib": "Nearly every component from the core and contrib repositories.",
+      "otelcol-k8s": "Components for running the Collector on Kubernetes.",
+      "otelcol-otlp": "A minimal distribution that only receives and exports OTLP."
+    },
+    "buildPage": {
+      "title": "Build your Collector",
+      "summary_one": "{{name}}: {{count}} component, Collector v{{version}}",
+      "summary_other": "{{name}}: {{count}} components, Collector v{{version}}",
+      "editBuild": "Edit build",
+      "manifestHeading": "OCB manifest",
+      "copyManifest": "Copy manifest",
+      "download": "Download",
+      "excludedHeading": "Left out of the manifest",
+      "excludedUnavailable": "Not in v{{version}}: {{names}}",
+      "excludedMissingModule": "No Go module data yet: {{names}}",
+      "instructionsHeading": "Build instructions",
+      "copyCommand": "Copy command",
+      "copyFile": "Copy file",
+      "tabs": {
+        "local": "Local",
+        "docker": "Docker",
+        "github": "GitHub Actions"
+      },
+      "local": {
+        "go": "Install <goLink>Go</goLink>. OCB uses it to compile your Collector.",
+        "save": "Save the manifest as <code>{{file}}</code>.",
+        "install": "Install OCB v{{version}}. Its version has to match the Collector version of your components.",
+        "installAlt": "Or download a prebuilt <code>ocb</code> binary from the <releaseLink>OCB v{{version}} release</releaseLink> and run it in place of <code>builder</code>.",
+        "build": "Build your Collector. OCB writes the binary to <code>{{binary}}</code>.",
+        "run": "Run it with your Collector configuration."
+      },
+      "docker": {
+        "save": "Save the manifest as <code>{{file}}</code>.",
+        "dockerfile": "Next to it, create a <code>Dockerfile</code>. The first stage builds your Collector with the OCB image, and the second packages the binary in a minimal image.",
+        "build": "Build the image.",
+        "run": "Run it, mounting your Collector configuration."
+      },
+      "github": {
+        "save": "Commit the manifest to your repository as <code>{{file}}</code>.",
+        "workflow": "Add this workflow as <code>{{path}}</code>. It builds your Collector whenever the manifest changes, and whenever you run it by hand.",
+        "artifact": "Download the binary from the workflow run's <code>{{name}}</code> artifact."
+      },
+      "empty": {
+        "title": "Nothing to build yet",
+        "description": "Your build has no components that can go in a manifest.",
+        "action": "Go to the Collector Builder"
+      }
+    }
   }
 }

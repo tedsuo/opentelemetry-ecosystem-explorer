@@ -42,6 +42,16 @@ const CollectorDetailPage = lazy(() =>
     default: m.CollectorDetailPage,
   }))
 );
+const CollectorBuilderPage = lazy(() =>
+  import("@/features/collector/builder/collector-builder-page").then((m) => ({
+    default: m.CollectorBuilderPage,
+  }))
+);
+const CollectorBuildPage = lazy(() =>
+  import("@/features/collector/builder/collector-build-page").then((m) => ({
+    default: m.CollectorBuildPage,
+  }))
+);
 // v1-only route: the diff page has no legacy counterpart, so both route tables
 // import the v1 component (same pattern as /_dev/components below). Kept in
 // sync per the route-table mirror rule until this file is deleted.
@@ -136,6 +146,12 @@ export function LegacyApp() {
                 path="/collector/components/:distribution/:name/diff"
                 element={<CollectorDiffPage />}
               />
+              {isEnabled("COLLECTOR_BUILDER") && (
+                <Route path="/collector/builder" element={<CollectorBuilderPage />} />
+              )}
+              {isEnabled("COLLECTOR_BUILDER") && (
+                <Route path="/collector/builder/build" element={<CollectorBuildPage />} />
+              )}
               <Route path="/semantic-conventions" element={<SemanticConventionsPage />} />
               <Route
                 path="/semantic-conventions/timeline"

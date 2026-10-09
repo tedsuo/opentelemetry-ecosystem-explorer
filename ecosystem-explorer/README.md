@@ -123,6 +123,8 @@ The available feature flags are defined in `src/lib/feature-flags.ts`:
 
 - `V1_REDESIGN` — switches the app to the in-progress v1 redesign (`src/v1/`)
 - `DEV_SHOWCASE` — enables the `/_dev/components` component showcase route
+- `COLLECTOR_BUILDER` — enables the Collector Builder (`/collector/builder`) and its "Add to build"
+  controls
 
 **Deployment behavior:**
 

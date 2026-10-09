@@ -61,6 +61,16 @@ const CollectorListPage = lazy(() =>
 const CollectorDetailPage = lazy(() =>
   import("@/v1/features/detail/detail-page").then((m) => ({ default: m.CollectorDetailPageV1 }))
 );
+const CollectorBuilderPage = lazy(() =>
+  import("@/features/collector/builder/collector-builder-page").then((m) => ({
+    default: m.CollectorBuilderPage,
+  }))
+);
+const CollectorBuildPage = lazy(() =>
+  import("@/features/collector/builder/collector-build-page").then((m) => ({
+    default: m.CollectorBuildPage,
+  }))
+);
 const CollectorDiffPage = lazy(() =>
   import("@/v1/features/detail/diff-page").then((m) => ({ default: m.CollectorDiffPageV1 }))
 );
@@ -153,6 +163,12 @@ export function V1App() {
                 path="/collector/components/:distribution/:name/diff"
                 element={<CollectorDiffPage />}
               />
+              {isEnabled("COLLECTOR_BUILDER") && (
+                <Route path="/collector/builder" element={<CollectorBuilderPage />} />
+              )}
+              {isEnabled("COLLECTOR_BUILDER") && (
+                <Route path="/collector/builder/build" element={<CollectorBuildPage />} />
+              )}
               <Route path="/semantic-conventions" element={<SemanticConventionsPage />} />
               <Route
                 path="/semantic-conventions/timeline"

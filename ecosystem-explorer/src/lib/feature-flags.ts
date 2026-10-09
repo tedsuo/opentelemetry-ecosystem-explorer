@@ -25,6 +25,10 @@ const FEATURE_FLAGS = [
   // screenshot CI builds enable it so the visual-regression and a11y baseline
   // can cover the design-system primitives in isolation.
   "DEV_SHOWCASE",
+
+  // Collector Builder: pick components into a build and generate an OCB manifest.
+  // Off in production until the explorer database carries each component's Go module.
+  "COLLECTOR_BUILDER",
 ] as const;
 
 const FEATURE_FLAG_PREFIX = "VITE_FEATURE_FLAG_";

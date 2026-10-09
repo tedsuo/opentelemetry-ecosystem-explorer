@@ -140,6 +140,18 @@ export const STATIC_ROUTE_META: Record<string, SeoMeta> = {
       "Browse and search all OpenTelemetry Collector components — receivers, processors, " +
       "exporters, and connectors — by distribution, type, and stability.",
   },
+  "/collector/builder": {
+    title: "Collector Builder — OpenTelemetry Ecosystem Explorer",
+    description:
+      "Pick OpenTelemetry Collector components for a custom distribution and generate the " +
+      "OpenTelemetry Collector Builder (OCB) manifest that builds it.",
+  },
+  "/collector/builder/build": {
+    title: "Build a Custom Collector — OpenTelemetry Ecosystem Explorer",
+    description:
+      "Get the OCB manifest for your custom OpenTelemetry Collector distribution, with " +
+      "instructions for building it locally, with Docker, or in GitHub Actions.",
+  },
   "/java-agent": {
     title: "OpenTelemetry Java Agent — Ecosystem Explorer",
     description:

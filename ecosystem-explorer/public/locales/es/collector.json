@@ -465,5 +465,135 @@
     },
     "loading": "Cargando datos del ecosistema del Collector...",
     "error": "Error al cargar los datos del Collector"
+  },
+  "builder": {
+    "title": "Constructor del Collector",
+    "description": "Elige los componentes de una distribución personalizada del OpenTelemetry Collector y obtén el manifiesto del OpenTelemetry Collector Builder (OCB) que la construye.",
+    "privacyNote": "Tu build se guarda solo en este navegador. No se envía nada a ningún servidor y no necesitas una cuenta.",
+    "toggle": {
+      "label": "Agregar al build",
+      "ariaLabel": "Agregar {{name}} al build",
+      "titleAdd": "Agregar a tu build del Collector",
+      "titleRemove": "En tu build del Collector. Selecciona para quitarlo."
+    },
+    "cart": {
+      "ariaLabel_zero": "Build del Collector, vacío",
+      "ariaLabel_one": "Build del Collector, {{count}} componente",
+      "ariaLabel_other": "Build del Collector, {{count}} componentes"
+    },
+    "page": {
+      "loading": "Cargando componentes del Collector…",
+      "error": "No se pudieron cargar los componentes del Collector. Intenta recargar la página.",
+      "settingsHeading": "Distribución",
+      "nameLabel": "Nombre",
+      "nameHelp": "Define dist.name, el nombre de archivo del binario del Collector.",
+      "nameError": "Usa letras minúsculas y números, con un solo punto, guion o guion bajo entre ellos.",
+      "versionLabel": "Versión del Collector",
+      "versionValue": "v{{version}}, la versión más reciente de core y contrib",
+      "componentsHeading": "Componentes",
+      "componentCount_one": "{{count}} componente",
+      "componentCount_other": "{{count}} componentes",
+      "pickerLabel": "Agregar componentes",
+      "pickerPlaceholder": "Busca componentes para agregar",
+      "emptyTitle": "Tu build está vacío",
+      "emptyDescription": "Agrega componentes desde la lista de componentes, o empieza desde un manifiesto de OCB, una configuración del Collector o una distribución predefinida.",
+      "browseComponents": "Explorar componentes",
+      "removeAriaLabel": "Quitar {{name}} del build",
+      "clear": "Quitar todos",
+      "clearConfirm": "¿Quitar todos los componentes de tu build?",
+      "unavailableHeading": "No están en v{{version}}",
+      "unavailableDescription": "Estos componentes no forman parte de la versión más reciente, así que el manifiesto los omite.",
+      "missingModule": "Todavía no hay datos del módulo Go, así que el manifiesto lo omite.",
+      "build": "Construir",
+      "buildHint": "Agrega un componente que pueda ir en el manifiesto para construir."
+    },
+    "import": {
+      "heading": "Empezar desde",
+      "submit": "Agregar al build",
+      "cancel": "Cancelar",
+      "done": "Listo",
+      "added_zero": "No hay componentes nuevos. Todo lo reconocido ya está en tu build.",
+      "added_one": "Se agregó {{count}} componente a tu build.",
+      "added_other": "Se agregaron {{count}} componentes a tu build.",
+      "nameSet": "El nombre de la distribución ahora es {{name}}.",
+      "unrecognizedHeading": "No reconocidos, así que no se agregaron:",
+      "errors": {
+        "empty": "Pega un archivo para importar.",
+        "invalid-yaml": "Esto no es YAML válido.",
+        "not-a-mapping": "Se esperaba un mapa YAML en el nivel superior del archivo."
+      },
+      "manifest": {
+        "button": "Manifiesto de OCB",
+        "title": "Importar un manifiesto de OCB",
+        "description": "Pega un builder-config.yaml. Sus receivers, processors, exporters, connectors y extensions se agregan a tu build, y su dist.name pasa a ser el nombre de tu distribución.",
+        "label": "Manifiesto de OCB",
+        "skippedNote": "Los providers, converters y directivas replace no se importan.",
+        "noComponents": "No se encontraron listas de receivers, processors, exporters, connectors ni extensions con entradas gomod."
+      },
+      "config": {
+        "button": "Configuración del Collector",
+        "title": "Importar una configuración del Collector",
+        "description": "Pega un archivo de configuración del Collector. Cada componente que configura se agrega a tu build.",
+        "label": "Configuración del Collector",
+        "noComponents": "No se encontraron secciones receivers, processors, exporters, connectors ni extensions."
+      }
+    },
+    "distributions": {
+      "button": "Distribución predefinida",
+      "title": "Empezar desde una distribución predefinida",
+      "description": "Agrega los componentes de una distribución oficial del OpenTelemetry Collector. La pertenencia viene de los metadatos de cada componente, así que puede diferir un poco del manifiesto de la versión publicada de la distribución.",
+      "add_one": "Agregar {{count}} componente",
+      "add_other": "Agregar {{count}} componentes",
+      "addAriaLabel_one": "Agregar {{count}} componente de {{name}}",
+      "addAriaLabel_other": "Agregar {{count}} componentes de {{name}}",
+      "otelcol": "La distribución core: OTLP más un conjunto de componentes muy usados.",
+      "otelcol-contrib": "Casi todos los componentes de los repositorios core y contrib.",
+      "otelcol-k8s": "Componentes para ejecutar el Collector en Kubernetes.",
+      "otelcol-otlp": "Una distribución mínima que solo recibe y exporta OTLP."
+    },
+    "buildPage": {
+      "title": "Construye tu Collector",
+      "summary_one": "{{name}}: {{count}} componente, Collector v{{version}}",
+      "summary_other": "{{name}}: {{count}} componentes, Collector v{{version}}",
+      "editBuild": "Editar build",
+      "manifestHeading": "Manifiesto de OCB",
+      "copyManifest": "Copiar manifiesto",
+      "download": "Descargar",
+      "excludedHeading": "Omitidos del manifiesto",
+      "excludedUnavailable": "No están en v{{version}}: {{names}}",
+      "excludedMissingModule": "Todavía sin datos del módulo Go: {{names}}",
+      "instructionsHeading": "Instrucciones de construcción",
+      "copyCommand": "Copiar comando",
+      "copyFile": "Copiar archivo",
+      "tabs": {
+        "local": "Local",
+        "docker": "Docker",
+        "github": "GitHub Actions"
+      },
+      "local": {
+        "go": "Instala <goLink>Go</goLink>. OCB lo usa para compilar tu Collector.",
+        "save": "Guarda el manifiesto como <code>{{file}}</code>.",
+        "install": "Instala OCB v{{version}}. Su versión debe coincidir con la versión del Collector de tus componentes.",
+        "installAlt": "O descarga un binario <code>ocb</code> precompilado desde la <releaseLink>versión v{{version}} de OCB</releaseLink> y ejecútalo en lugar de <code>builder</code>.",
+        "build": "Construye tu Collector. OCB escribe el binario en <code>{{binary}}</code>.",
+        "run": "Ejecútalo con tu configuración del Collector."
+      },
+      "docker": {
+        "save": "Guarda el manifiesto como <code>{{file}}</code>.",
+        "dockerfile": "Junto a él, crea un <code>Dockerfile</code>. La primera etapa construye tu Collector con la imagen de OCB y la segunda empaqueta el binario en una imagen mínima.",
+        "build": "Construye la imagen.",
+        "run": "Ejecútala montando tu configuración del Collector."
+      },
+      "github": {
+        "save": "Haz commit del manifiesto en tu repositorio como <code>{{file}}</code>.",
+        "workflow": "Agrega este workflow como <code>{{path}}</code>. Construye tu Collector cada vez que cambia el manifiesto y cada vez que lo ejecutas manualmente.",
+        "artifact": "Descarga el binario desde el artefacto <code>{{name}}</code> de la ejecución del workflow."
+      },
+      "empty": {
+        "title": "Todavía no hay nada que construir",
+        "description": "Tu build no tiene componentes que puedan ir en un manifiesto.",
+        "action": "Ir al Constructor del Collector"
+      }
+    }
   }
 }
