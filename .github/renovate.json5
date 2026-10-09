@@ -59,5 +59,15 @@
       datasourceTemplate: "github-releases",
       extractVersionTemplate: "^bun-v(?<version>.+)$",
     },
+    // The Collector Builder shows users a GitHub Actions workflow whose actions are pinned
+    // like ours; this keeps those pins current, since only workflow files are scanned by default.
+    {
+      customType: "regex",
+      managerFilePatterns: ["/^ecosystem-explorer/src/features/collector/builder/instructions\\.ts$/"],
+      matchStrings: [
+        "uses: (?<depName>[\\w.-]+/[\\w.-]+)@(?<currentDigest>[0-9a-f]{40}) # (?<currentValue>v\\d+\\.\\d+\\.\\d+)",
+      ],
+      datasourceTemplate: "github-tags",
+    },
   ],
 }
