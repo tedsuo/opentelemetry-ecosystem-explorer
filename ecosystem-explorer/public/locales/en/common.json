@@ -16,5 +16,8 @@
     "title": "404 - Page Not Found",
     "description": "The page you're looking for doesn't exist. You may have mistyped the address or the page may have moved.",
     "returnHome": "Return to Home"
-  }
+  },
+  "search": "Search...",
+  "noOptionsFound": "No options found",
+  "selectedCount": "{{count}} selected"
 }

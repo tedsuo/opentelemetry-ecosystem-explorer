@@ -17,6 +17,7 @@ import { useState, useId, type ReactNode } from "react";
 import { Search, ChevronDown, Check, X } from "lucide-react";
 import * as Popover from "@radix-ui/react-popover";
 import { Command } from "cmdk";
+import { useTranslation } from "react-i18next";
 
 interface SearchableMultiSelectProps {
   label: string;
@@ -37,6 +38,7 @@ export function SearchableMultiSelect({
   renderOption,
   className = "",
 }: SearchableMultiSelectProps) {
+  const { t } = useTranslation("common");
   const [isOpen, setIsOpen] = useState(false);
   const triggerId = useId();
 
@@ -65,7 +67,7 @@ export function SearchableMultiSelect({
             <span
               className={selected.length === 0 ? "text-muted-foreground/50" : "text-foreground"}
             >
-              {selected.length === 0 ? placeholder : `${selected.length} selected`}
+              {selected.length === 0 ? placeholder : t("selectedCount", { count: selected.length })}
             </span>
             <ChevronDown
               className={`text-muted-foreground h-4 w-4 transition-transform duration-200 ${
@@ -85,7 +87,7 @@ export function SearchableMultiSelect({
                 <div className="relative">
                   <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
                   <Command.Input
-                    placeholder="Search..."
+                    placeholder={t("search")}
                     className="bg-muted/50 focus:bg-muted w-full rounded-md py-1.5 pr-3 pl-9 text-sm transition-colors focus:outline-none"
                   />
                 </div>
@@ -93,7 +95,7 @@ export function SearchableMultiSelect({
 
               <Command.List className="custom-scrollbar max-h-[240px] overflow-y-auto p-1">
                 <Command.Empty className="text-muted-foreground py-4 text-center text-sm">
-                  No options found
+                  {t("noOptionsFound")}
                 </Command.Empty>
                 <Command.Group>
                   {options.map((option) => (
